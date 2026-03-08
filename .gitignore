@@ -1,0 +1,36 @@
+# Maven
+**/target/
+
+# Gradle
+**/build/
+
+# Logs
+**/*.log
+logs/
+
+# IDE files
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+
+# VS Code
+.vscode/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+**/application-local.properties
+**/application-secret.properties
+**/application-local.yml
+**/application-secret.yml
+
+# Java
+**/*.class
+
+# Optional
+out/
