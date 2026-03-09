@@ -1,0 +1,51 @@
+local.file_match "spring_logs" {
+  path_targets = [
+    {
+      __path__ = "/var/log/myapps/*.log",
+      job      = "spring-boot",
+      app      = "distributed-demo",
+      env      = "local",
+    },
+  ]
+  sync_period = "5s"
+}
+
+loki.source.file "spring_logs" {
+  targets       = local.file_match.spring_logs.targets
+  forward_to    = [loki.process.parse_and_label.receiver]
+  tail_from_end = true
+}
+
+loki.process "parse_and_label" {
+  stage.logfmt {
+    mapping = {
+      "ts"            = "ts",
+      "level"         = "level",
+      "service"       = "service",
+      "traceId"       = "traceId",
+      "spanId"        = "spanId",
+      "parentSpanId"  = "parentSpanId",
+      "correlationId" = "correlationId",
+      "logger"        = "logger",
+      "msg"           = "msg",
+    }
+  }
+
+  stage.labels {
+    values = {
+      "job"     = "spring-boot",
+      "app"     = "distributed-demo",
+      "env"     = "local",
+      "service" = "service",
+      "level"   = "level",
+    }
+  }
+
+  forward_to = [loki.write.default.receiver]
+}
+
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
